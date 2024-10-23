@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>GOG Game Store</title>
+</head>
+<body>
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">GOG Store</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/loja">Loja</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/sobre">Sobre</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/comunidade">Comunidade</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/suporte">Suporte</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="mt-4">GOG Game Store</h1>
+        <div id="game-list" class="row">
+            <!-- Jogos serão listados aqui -->
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $.get("/games", function(data) {
+                if (data.error) {
+                    $("#game-list").html("<p>Erro ao carregar jogos</p>");
+                } else {
+                    let html = "";
+                    data.forEach(function(game) {
+                        html += `
+                            <div class="col-md-4">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${game.title}</h5>
+                                        <div>${game.image}</div>
+                                        <p class="card-text">Price: ${game.price.amount} ${game.price.currency}</p>
+                                    </div>
+                                </div>
+                            </div>`;
+                    });
+                    $("#game-list").html(html);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

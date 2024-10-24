@@ -41,26 +41,35 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script>
         $(document).ready(function() {
-            $.get("/games", function(data) {
-                if (data.error) {
-                    $("#game-list").html("<p>Erro ao carregar jogos</p>");
-                } else {
-                    let html = "";
-                    data.forEach(function(game) {
-                        html += `
-                            <div class="col-md-4">
-                                <div class="card mb-4">
-                                    <div class="card-body">
-                                        <h5 class="card-title">${game.title}</h5>
-                                        <div>${game.image}</div>
-                                        <p class="card-text">Price: ${game.price.amount} ${game.price.currency}</p>
+            const proxyUrl = "https://cors-anywhere.herokuapp.com/"; // URL do proxy
+            const apiUrl = "https://www.gog.com/games/ajax/filtered"; // URL da API
+    
+            $.get(proxyUrl + apiUrl, { mediaType: 'game', sortBy: 'popularity' })
+                .done(function(data) {
+                    if (data.error) {
+                        $("#game-list").html("<p>Erro ao carregar jogos</p>");
+                    } else {
+                        let html = "";
+                        data.products.forEach(function(game) {
+                            const imageUrl = game.image.startsWith('http') ? game.image : 'https:' + game.image;
+    
+                            html += `
+                                <div class="col-md-4">
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${game.title}</h5>
+                                            <img src="${imageUrl}" alt="${game.title}" class="card-img-top">
+                                            <p class="card-text">Price: ${game.price.amount} ${game.price.currency}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>`;
-                    });
-                    $("#game-list").html(html);
-                }
-            });
+                                </div>`;
+                        });
+                        $("#game-list").html(html);
+                    }
+                })
+                .fail(function() {
+                    $("#game-list").html("<p>Erro ao carregar jogos</p>");
+                });
         });
     </script>
 </body>

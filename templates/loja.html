@@ -7,12 +7,16 @@
     <title>Loja - GOG Game Store</title>
 </head>
 <body>
-    {% include 'navbar.html' %}
-    <div class="container">
-        <h1 class="mt-4">Loja</h1>
-        <div id="game-list" class="row">
-            <!-- Aqui você pode listar os jogos da mesma forma que fez na página inicial -->
-        </div>
+    <h1>Loja de Jogos</h1>
+    <div class="jogos">
+        {% for jogo in jogos %}
+            <div class="jogo">
+                <h2>{{ jogo.nome }}</h2>
+                <p>{{ jogo.descricao }}</p>
+                <p>Preço: R$ {{ jogo.preco }}</p>
+                <p>Data de Lançamento: {{ jogo.data_lancamento }}</p>
+            </div>
+        {% endfor %}
     </div>
 </body>
 </html>

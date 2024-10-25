@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,15 +8,22 @@
 </head>
 <body>
     <h1>Loja de Jogos</h1>
-    <div class="jogos">
-        {% for jogo in jogos %}
-            <div class="jogo">
-                <h2>{{ jogo.nome }}</h2>
-                <p>{{ jogo.descricao }}</p>
-                <p>Preço: R$ {{ jogo.preco }}</p>
-                <p>Data de Lançamento: {{ jogo.data_lancamento }}</p>
-            </div>
-        {% endfor %}
+    <div class="container">
+        <div class="jogos row">
+            {% for jogo in jogos %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ jogo.background_image }}" class="card-img-top" alt="{{ jogo.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ jogo.name }}</h5>
+                            <p class="card-text">{{ jogo.description_raw }}</p>
+                            <p>Preço: R$ {{ jogo.preco }}</p>
+                            <p>Data de Lançamento: {{ jogo.released }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </body>
 </html>

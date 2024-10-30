@@ -1,0 +1,70 @@
+/* Define um fundo roxo escuro para a página */
+body {
+    background-color: #2e004f; /* Roxo escuro */
+    color: #f3e5ff; /* Texto claro para contraste */
+}
+
+/* Estilo do Navbar */
+.navbar {
+    background-color: #4b0082; /* Roxo intenso */
+}
+
+.navbar-brand, .navbar-nav .nav-link {
+    color: #f3e5ff !important;
+}
+
+.navbar .form-control {
+    background-color: #4b0082;
+    color: #f3e5ff;
+    border: 1px solid #7a42a6; /* Roxo médio */
+}
+
+.btn-outline-success {
+    color: #f3e5ff;
+    border-color: #7a42a6;
+}
+
+.btn-outline-success:hover {
+    background-color: #7a42a6;
+    border-color: #4b0082;
+}
+
+/* Títulos e texto */
+h1, .card-title {
+    color: #dda0dd; /* Roxo claro */
+}
+
+/* Estilos dos cards */
+.card {
+    background-color: #7a42a6; /* Roxo médio */
+    border: 1px solid #dda0dd; /* Borda roxa clara */
+    color: #f3e5ff;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.btn-primary {
+    background-color: #4b0082; /* Roxo escuro */
+    border: none;
+    color: #f3e5ff;
+}
+
+.btn-primary:hover {
+    background-color: #dda0dd; /* Roxo claro */
+    color: #2e004f; /* Texto mais escuro para contraste */
+}
+
+/* Ajusta o botão de "Adicionar ao Carrinho" */
+.add-to-cart {
+    margin-top: auto;
+}

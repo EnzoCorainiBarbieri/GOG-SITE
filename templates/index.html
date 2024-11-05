@@ -3,38 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPI_4SEMESTRE</title>
+    <title>PPI_4SEMESTRE - Loja de Jogos</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="static/styles.css">
-    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"> 
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Nuuvem falsa</a>
+    <a class="navbar-brand" href="#">
+        <i class="fas fa-gamepad"></i> Nuuvem Falsa
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-        <form class="form-inline" onsubmit="return false;">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/login">
+                    <i class="fas fa-user"></i> Entrar/Cadastrar
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/cart">
+                    <i class="fas fa-shopping-cart"></i> Carrinho
+                </a>
+            </li>
+        </ul>
+        <form class="form-inline ml-3" onsubmit="return false;">
             <input class="form-control mr-sm-2" id="search" type="search" placeholder="Buscar jogos" aria-label="Buscar">
-            <button class="btn btn-outline-success my-2 my-sm-0" onclick="searchGames()">Buscar</button>
+            <button class="btn btn-outline-success my-2 my-sm-0" onclick="searchGames()">
+                <i class="fas fa-search"></i> Buscar
+            </button>
         </form>
     </div>
-    <button class="btn btn-outline-success ml-3 my-2 my-sm-0">Fazer login<button>
-            
-    <i class="fa fa-shopping-cart" aria-hidden="true"></i>
 </nav>
 
 <div class="container mt-5">
-    <h1 class="mb-4" style="text-align: center;">Nossos jogos</h1>
+    <h1 class="mb-4 text-center">Nossos Jogos</h1>
     <div class="row" id="game-list">
-        {% for game in games %}
-        <div class="col-md-4 mb-4 game-card" data-name="{{ game['name'] }}">
-            <div class="card">
-                <img class="card-img-top" src="{{ game['image'] }}" alt="Imagem do jogo">
+        {% for game in jogos %}
+        <div class="col-md-4 mb-4 game-card" data-name="{{ game[2] }}"> <!-- game[2] refere-se ao nome do jogo -->
+            <div class="card shadow-sm">
+                <img class="card-img-top" src="{{ game[4] }}" alt="Imagem do jogo"> <!-- game[4] refere-se à imagem -->
                 <div class="card-body">
-                    <h5 class="card-title">{{ game['name'] }}</h5>
-                    <p class="card-text">{{ game['description'] }}</p>
-                    <p class="card-text">Preço: {{ game['price'] }}</p>
-                    <button class="btn btn-primary add-to-cart" data-appid="{{ game['appid'] }}">Adicionar ao Carrinho</button>
+                    <h5 class="card-title">{{ game[2] }}</h5>
+                    <p class="card-text">{{ game[5] }}</p> <!-- game[5] refere-se à descrição -->
+                    <p class="card-text font-weight-bold">Preço: {{ game[3] }}</p> <!-- game[3] refere-se ao preço -->
+                    <button class="btn btn-primary add-to-cart" data-appid="{{ game[1] }}">
+                        <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                    </button>
                 </div>
             </div>
         </div>

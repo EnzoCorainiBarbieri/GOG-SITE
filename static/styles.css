@@ -1,6 +1,6 @@
 /* Define um fundo roxo escuro para a página */
 body {
-    background-color: #2e004f; /* Roxo escuro */
+    background-color: #2e004f; /* Roxo escuro (valor original) */
     color: #f3e5ff; /* Texto claro para contraste */
     font-family: Arial, sans-serif; /* Fonte padrão */
 }

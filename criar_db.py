@@ -4,6 +4,7 @@ def criar_tabelas():
     conexao = sqlite3.connect('database.db')
     cursor = conexao.cursor()
 
+    # Criação da tabela de jogos
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS jogos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,6 +17,7 @@ def criar_tabelas():
         );
     ''')
 
+    # Criação da tabela de clientes
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS clientes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,19 +29,33 @@ def criar_tabelas():
         );
     ''')
 
+    # Criação da tabela de carrinho
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS carrinho (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             cliente_id INTEGER,
             jogo_id INTEGER,
             quantidade INTEGER DEFAULT 1,
-            FOREIGN KEY (cliente_id) REFERENCES clientes(id),
-            FOREIGN KEY (jogo_id) REFERENCES jogos(id)
+            FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
+            FOREIGN KEY (jogo_id) REFERENCES jogos(id) ON DELETE CASCADE
         );
+    ''')
+
+    # Criando índices para melhorar a performance das consultas (exemplo)
+    cursor.execute('''
+        CREATE INDEX IF NOT EXISTS idx_cliente_email ON clientes(email);
+    ''')
+    cursor.execute('''
+        CREATE INDEX IF NOT EXISTS idx_jogo_nome ON jogos(nome);
+    ''')
+    cursor.execute('''
+        CREATE INDEX IF NOT EXISTS idx_carrinho_cliente_id ON carrinho(cliente_id);
     ''')
 
     conexao.commit()
     conexao.close()
+
+
 
 if __name__ == '__main__':
     criar_tabelas()

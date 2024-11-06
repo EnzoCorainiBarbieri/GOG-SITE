@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuário</title>
+</head>
+<body>
+    <h1>Bem-vindo, {{ usuario[0] }}!</h1>  <!-- Exibe o nome do usuário -->
+    <p>Email: {{ usuario[1] }}</p>  <!-- Exibe o email do usuário -->
+    
+    <h2>Jogos no Carrinho</h2>
+    <ul>
+        {% if jogos_comprados %}
+            {% for jogo in jogos_comprados %}
+                <li>
+                    <strong>{{ jogo[0] }}</strong> - Preço: {{ jogo[1] }} - Quantidade: {{ jogo[2] }}
+                </li>
+            {% endfor %}
+        {% else %}
+            <p>Você não tem jogos no carrinho.</p>
+        {% endif %}
+    </ul>
+</body>
+</html>

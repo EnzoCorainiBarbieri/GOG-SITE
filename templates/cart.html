@@ -26,13 +26,13 @@
         </thead>
         <tbody>
             {% for item in cart_items %}
-            <tr>
+            <tr data-appid="{{ item[3] }}">
                 <td>{{ item[0] }}</td> <!-- Nome do item -->
-                <td>R$ {{ "%.2f"|format(item[1]) }}</td> <!-- Formatação para 2 casas decimais -->
+                <td>R$ {{ item[1] | float | round(2) }}</td> <!-- Preço formatado como float -->
                 <td>
                     <input type="number" min="1" value="{{ item[2] }}" class="form-control quantity-input" data-appid="{{ item[3] }}">
                 </td>
-                <td>R$ {{ "%.2f"|format(item[1] * item[2]) }}</td> <!-- Subtotal formatado -->
+                <td class="subtotal">R$ {{ (item[1] | float * item[2]) | round(2) }}</td> <!-- Subtotal formatado como float -->
                 <td>
                     <button class="btn btn-danger remove-from-cart" data-appid="{{ item[3] }}">
                         <i class="fas fa-trash"></i> Remover
@@ -42,7 +42,7 @@
             {% endfor %}
         </tbody>
     </table>
-    <h3 class="text-right">Total: R$ {{ "%.2f"|format(total) }}</h3> <!-- Total formatado -->
+    <h3 class="text-right">Total: R$ <span id="total">{{ total | float | round(2) }}</span></h3> <!-- Total formatado como float -->
     <button class="btn btn-success btn-lg float-right" id="checkout-button">Finalizar Compra</button>
     {% else %}
     <div class="alert alert-warning" role="alert">
@@ -59,7 +59,8 @@
         const appid = $(this).data('appid');
         $.post(`/remove_from_cart/${appid}`, function(data) {
             alert(data.message);
-            location.reload(); // Recarrega a página para atualizar o carrinho
+            $(`tr[data-appid="${appid}"]`).remove(); // Remove o item da tabela
+            $('#total').text(data.total.toFixed(2)); // Atualiza o total
         });
     });
 
@@ -69,15 +70,36 @@
         const quantity = $(this).val();
         $.post(`/update_cart/${appid}`, { quantity: quantity }, function(data) {
             alert(data.message);
-            location.reload(); // Recarrega a página para atualizar o carrinho
+            $('#total').text(data.total.toFixed(2)); // Atualiza o total
+            updateTotal(); // Atualiza o total manualmente após alterar a quantidade
         });
     });
 
+    // Função para atualizar o total
+    function updateTotal() {
+        let total = 0;
+        $('tr').each(function() {
+            const price = parseFloat($(this).find('td:eq(1)').text().replace('R$', '').trim());
+            const quantity = parseInt($(this).find('.quantity-input').val());
+            const subtotal = price * quantity;
+            $(this).find('.subtotal').text('R$ ' + subtotal.toFixed(2));
+            total += subtotal;
+        });
+        $('#total').text(total.toFixed(2)); // Atualiza o total no rodapé
+    }
+
     // Redirecionamento para a página de checkout
     $('#checkout-button').on('click', function() {
-        // Lógica para finalizar a compra, como redirecionar para a página de checkout
-        window.location.href = '/checkout';
+        $.post('/finalizar_compra', function(data) {
+            if (data.success) {
+                window.location.href = '/usuario'; // Redireciona para a página de usuário
+            } else {
+                alert('Erro ao finalizar a compra. Tente novamente!');
+            }
+        });
     });
+</script>
+</script>
 </script>
 </body>
 </html>

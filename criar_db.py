@@ -10,7 +10,7 @@ def criar_tabelas():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             appid INTEGER UNIQUE NOT NULL,
             nome VARCHAR(255) NOT NULL,
-            preco VARCHAR(50),
+            preco REAL,
             imagem_url TEXT,
             descricao TEXT,
             categorias TEXT
@@ -41,7 +41,19 @@ def criar_tabelas():
         );
     ''')
 
-    # Criando índices para melhorar a performance das consultas (exemplo)
+    # Criação da tabela de jogos_usuario (associando jogos aos clientes)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS jogos_usuario (
+            cliente_id INTEGER,
+            jogo_id INTEGER,
+            data_compra DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (cliente_id, jogo_id),
+            FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+            FOREIGN KEY (jogo_id) REFERENCES jogos(id)
+        );
+    ''')
+
+    # Criando índices para melhorar a performance das consultas
     cursor.execute('''
         CREATE INDEX IF NOT EXISTS idx_cliente_email ON clientes(email);
     ''')
@@ -54,8 +66,6 @@ def criar_tabelas():
 
     conexao.commit()
     conexao.close()
-
-
 
 if __name__ == '__main__':
     criar_tabelas()

@@ -19,7 +19,7 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         appid INTEGER UNIQUE NOT NULL,
         nome VARCHAR(255) NOT NULL,
-        preco VARCHAR(50),
+        preco DECIMAL(5,2),
         imagem_url TEXT,
         descricao TEXT,
         categorias TEXT
@@ -271,7 +271,7 @@ def add_to_cart(appid):
 
     return jsonify({'message': 'Jogo adicionado ao carrinho!', 'cart_count': cart_count})
 
-@app.route('/suporte')
+@app.route('/support')
 def suporte():
     return render_template('support.html')
 

@@ -1,17 +1,22 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="/">
-      <i class="fas fa-gamepad"></i> Nuuvem Falsa
+  <a style="font-family: Mindcontrol;" class="navbar-brand ml-4" href="/">
+      <i class="fas fa-gamepad"></i> GOG - GAMES ONLINE
   </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
+  </button> 
+  <div class="collapse navbar-collapse mr-3" id="navbarNav">
       <ul class="navbar-nav ml-auto">
           {% if session['user_id'] %}
               <!-- Exibe o nome do usuário e email -->
               <li class="nav-item">
                   <a class="nav-link" href="/usuario">
                       <i class="fas fa-user"></i> {{ session['user_name'] }} 
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="/support">
+                    <i class="fas fa-life-ring"> Suporte</i>
                   </a>
               </li>
               <!-- Link para deslogar -->
@@ -34,11 +39,5 @@
               </a>
           </li>
       </ul>
-      <form class="form-inline ml-3" onsubmit="return false;">
-          <input class="form-control mr-sm-2" id="search" type="search" placeholder="Buscar jogos" aria-label="Buscar">
-          <button class="btn btn-outline-success my-2 my-sm-0" onclick="searchGames()">
-              <i class="fas fa-search"></i> Buscar
-          </button>
-      </form>
   </div>
 </nav>

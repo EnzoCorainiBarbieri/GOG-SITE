@@ -9,48 +9,7 @@
     <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="/">
-            <i class="fas fa-gamepad"></i> Nuuvem Falsa
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                {% if session['user_id'] %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/usuario">
-                            <i class="fas fa-user"></i> {{ session['user_name'] }}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/logout">
-                            <i class="fas fa-sign-out-alt"></i> Sair
-                        </a>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">
-                            <i class="fas fa-user"></i> Entrar/Cadastrar
-                        </a>
-                    </li>
-                {% endif %}
-                <li class="nav-item">
-                    <a class="nav-link" href="/cart">
-                        <i class="fas fa-shopping-cart"></i> Carrinho (<span id="cart-count">0</span>)
-                    </a>
-                </li>
-            </ul>
-            <form class="form-inline ml-3" onsubmit="return false;">
-                <input class="form-control mr-sm-2" id="search" type="search" placeholder="Buscar jogos" aria-label="Buscar">
-                <button class="btn btn-outline-success my-2 my-sm-0" onclick="searchGames()">
-                    <i class="fas fa-search"></i> Buscar
-                </button>
-            </form>
-        </div>
-    </nav>
-
+    {% include 'navbar.html' %}
     <div class="container mt-5">
         <h1 class="mb-4 text-center">Seus Jogos</h1>
 

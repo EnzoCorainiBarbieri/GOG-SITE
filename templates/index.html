@@ -19,20 +19,17 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 {% if session['user_id'] %}
-                    <!-- Exibe o nome do usuário e email -->
                     <li class="nav-item">
                         <a class="nav-link" href="/usuario">
-                            <i class="fas fa-user"></i> {{ session['user_name'] }} 
+                            <i class="fas fa-user"></i> {{ session['user_name'] }} ({{ session['user_email'] }})
                         </a>
                     </li>
-                    <!-- Link para deslogar -->
                     <li class="nav-item">
                         <a class="nav-link" href="/logout">
                             <i class="fas fa-sign-out-alt"></i> Sair
                         </a>
                     </li>
                 {% else %}
-                    <!-- Se não estiver logado, exibe as opções de login -->
                     <li class="nav-item">
                         <a class="nav-link" href="/login">
                             <i class="fas fa-user"></i> Entrar/Cadastrar
@@ -41,7 +38,7 @@
                 {% endif %}
                 <li class="nav-item">
                     <a class="nav-link" href="/cart">
-                        <i class="fas fa-shopping-cart"></i> Carrinho
+                        <i class="fas fa-shopping-cart"></i> Carrinho (<span id="cart-count">0</span>)
                     </a>
                 </li>
             </ul>
@@ -97,11 +94,14 @@
     });
 
     $(document).on('click', '.add-to-cart', function() {
-        const appid = $(this).data('appid');
-        $.post(`/add_to_cart/${appid}`, function(data) {
-            alert(data.message + ` (Total no carrinho: ${data.cart_count})`);
-        });
+    const appid = $(this).data('appid');
+    $.post(`/add_to_cart/${appid}`, function(data) {
+        alert(data.message + ` (Total no carrinho: ${data.cart_count})`);
+    }).fail(function(error) {
+        alert('Erro ao adicionar o jogo ao carrinho: ' + error.responseJSON.message);
     });
+});
+
 </script>
 </body>
 </html>

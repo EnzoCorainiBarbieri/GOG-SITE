@@ -3,6 +3,8 @@ body {
     background-color: #2e004f; /* Roxo escuro (valor original) */
     color: #f3e5ff; /* Texto claro para contraste */
     font-family: Arial, sans-serif; /* Fonte padrão */
+    margin: 0;
+    padding: 0;
 }
 
 /* Estilo do Navbar */
@@ -55,6 +57,7 @@ body {
 /* Títulos e texto */
 h1, .card-title {
     color: #dda0dd; /* Roxo claro */
+    font-weight: 600;
 }
 
 /* Estilos dos cards */
@@ -85,6 +88,9 @@ h1, .card-title {
     }
     .card {
         margin-bottom: 15px;
+    }
+    .navbar-nav {
+        text-align: center;
     }
 }
 
@@ -148,3 +154,46 @@ h1, .card-title {
 .form-group .text-center a:hover {
     text-decoration: underline;
 }
+
+/* Estilos para o formulário de contato */
+.bg-light {
+    background-color: #7a42a6 !important; /* Roxo médio para seções de formulário */
+}
+
+footer {
+    background-color: #4b0082; /* Roxo intenso para o rodapé */
+    color: #f3e5ff;
+}
+
+/* Ajustes adicionais */
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 15px;
+}
+
+/* Estilo para os botões do acordeão */
+.accordion-button {
+    background-color: #4b0082; /* Roxo intenso */
+    color: #f3e5ff; /* Texto claro */
+    border: 1px solid #7a42a6; /* Borda roxa média */
+    padding: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+/* Alterações no botão ao passar o mouse */
+.accordion-button:hover {
+    background-color: #7a42a6; /* Roxo médio */
+    color: #2e004f; /* Texto escuro para contraste */
+    border-color: #dda0dd; /* Roxo claro */
+}
+
+/* Estado ativo do botão */
+.accordion-button:not(.collapsed) {
+    background-color: #7a42a6; /* Roxo médio */
+    color: #2e004f; /* Texto escuro para contraste */
+    border-color: #dda0dd; /* Roxo claro */
+}
+

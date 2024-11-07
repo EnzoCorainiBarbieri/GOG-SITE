@@ -68,11 +68,11 @@
             {% for item in cart_items %}
             <tr>
                 <td>{{ item['name'] }}</td>
-                <td>R$ {{ item['price'] }}</td>
+                <td>R$ {{ "%.2f"|format(item['price']) }}</td> <!-- Formatação para 2 casas decimais -->
                 <td>
                     <input type="number" min="1" value="{{ item['quantity'] }}" class="form-control quantity-input" data-appid="{{ item['appid'] }}">
                 </td>
-                <td>R$ {{ item['price'] * item['quantity'] }}</td>
+                <td>R$ {{ "%.2f"|format(item['price'] * item['quantity']) }}</td> <!-- Subtotal formatado -->
                 <td>
                     <button class="btn btn-danger remove-from-cart" data-appid="{{ item['appid'] }}">
                         <i class="fas fa-trash"></i> Remover
@@ -82,7 +82,7 @@
             {% endfor %}
         </tbody>
     </table>
-    <h3 class="text-right">Total: R$ {{ total }}</h3>
+    <h3 class="text-right">Total: R$ {{ "%.2f"|format(total) }}</h3> <!-- Total formatado -->
     <button class="btn btn-success btn-lg float-right" id="checkout-button">Finalizar Compra</button>
     {% else %}
     <div class="alert alert-warning" role="alert">
@@ -94,6 +94,7 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+    // Função para remover item do carrinho
     $(document).on('click', '.remove-from-cart', function() {
         const appid = $(this).data('appid');
         $.post(`/remove_from_cart/${appid}`, function(data) {
@@ -102,6 +103,7 @@
         });
     });
 
+    // Função para atualizar a quantidade do produto no carrinho
     $(document).on('change', '.quantity-input', function() {
         const appid = $(this).data('appid');
         const quantity = $(this).val();
@@ -111,6 +113,7 @@
         });
     });
 
+    // Redirecionamento para a página de checkout
     $('#checkout-button').on('click', function() {
         // Lógica para finalizar a compra, como redirecionar para a página de checkout
         window.location.href = '/checkout';

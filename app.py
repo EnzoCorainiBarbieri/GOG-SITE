@@ -4,6 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import requests
 from datetime import datetime
 import pytz
+import os
+
 brasil_tz = pytz.timezone('America/Sao_Paulo')
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///meu_banco.db'

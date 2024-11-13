@@ -1,0 +1,127 @@
+/* Corpo da página */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #330057; /* Cor roxa especificada como fundo */
+    color: white;
+}
+
+/* Navegação */
+.navbar {
+    background-color: #4b006e; /* Roxo mais claro para a barra de navegação */
+    padding: 1rem;
+}
+
+.navbar .navbar-brand {
+    font-family: 'Mindcontrol', sans-serif;
+    color: white !important;
+    font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+    color: #e0b3ff !important; /* Roxo bem suave para o texto do menu */
+    font-weight: 500;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #d19eff !important; /* Roxo mais suave no hover */
+}
+
+/* Título da página */
+h1 {
+    text-align: center;
+    margin-top: 3rem;
+    font-size: 2.5rem;
+    color: #e0b3ff;
+}
+
+/* Cartões de jogos */
+.card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #440073; /* Roxo suave para os cartões */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.card-img-top {
+    width: 100%;
+    height: auto;
+    border-bottom: 2px solid #5b006e; /* Roxo mais escuro para separar a imagem do conteúdo */
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    color: #e0b3ff;
+    margin-bottom: 1rem;
+}
+
+.card-text {
+    color: #b76fd7; /* Roxo mais suave para o texto */
+}
+
+.card-body button {
+    background-color: #5b006e; /* Roxo para o botão */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.card-body button:hover {
+    background-color: #6b0080; /* Roxo mais claro no hover */
+}
+
+/* Notificações (toast) */
+.toast-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+}
+
+.toast {
+    width: 300px;
+    border-radius: 10px;
+}
+
+.toast-body {
+    color: white;
+    padding: 1rem;
+    font-size: 1rem;
+}
+
+/* Fim do conteúdo */
+footer {
+    background-color: #4b006e; /* Roxo mais claro para o rodapé */
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    margin-top: 3rem;
+}
+
+footer a {
+    color: #e0b3ff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #d19eff;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1.5rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+}

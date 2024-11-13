@@ -1,84 +1,123 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPI_4SEMESTRE - Loja de Jogos</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <title>Lista de Jogos</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="static/styles.css"> 
+    <link rel="stylesheet" href="static/index.css">
 </head>
-
 <body>
-    {% include 'navbar.html' %}
-    <div class="container mt-5">
-        <div class="container d-flex align-items-center justify-content-between">
-            <h1 class=" text-center" id="titulo_index">Nossos Jogos</h1>
-            <form class="form-inline ml-3" onsubmit="return false;">
-                <input class="form-control mr-sm-2" id="search" type="search" placeholder="Buscar jogos"
-                    aria-label="Buscar">
-                <button class="btn btn-outline-success my-sm-0" onclick="searchGames()">
-                    <i class="fas fa-search"></i> Buscar
-                </button>
-            </form>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a style="font-family: Mindcontrol;" class="navbar-brand ml-4" href="/">
+            <i class="fas fa-gamepad"></i> GOG - GAMES ONLINE
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse mr-3" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if 'usuario_id' in session %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('perfil') }}">
+                            <i class="fas fa-user"></i> {{ session['user_name'] }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('suporte') }}">
+                            <i class="fas fa-life-ring"> Suporte</i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('carrinho') }}">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="badge badge-light">{{ session.get('carrinho', [])|length }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt"></i> Sair
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-user"></i> Entrar/Cadastrar
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
-        <div class="row" id="game-list">
-            {% for game in jogos %}
-            <div class="col-md-4 mb-4 game-card" data-name="{{ game[2] }}"> <!-- game[2] refere-se ao nome do jogo -->
-                <div class="card shadow-sm">
-                    <!-- Corrigindo o nome do parâmetro para 'appid' -->
-                    <a href="{{ url_for('game_details', appid=game[1]) }}">
-                        <img class="card-img-top" src="{{ game[4] }}" alt="Imagem do jogo">
-                        <!-- game[4] refere-se à imagem -->
-                        <div class="card-body">
-                            <h5 class="card-title">{{ game[2] }}</h5>
-                            <p class="card-text font-weight-bold">Preço: {{ game[3] }}</p>
-                            <!-- game[3] refere-se ao preço -->
-                        </div>
-                    </a>
-                    <div class="card-body">
-                        <button class="btn btn-primary add-to-cart" data-appid="{{ game[1] }}">
-                            <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
-                        </button>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+    </nav>
+    
+    <div class="container-1">
+        <h1>CONFIRA NOSSOS JOGOS</h1>
         
+        <div id="toast-container" class="toast-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="toast" data-delay="3000">
+                            <div class="toast-header">
+                                <strong class="mr-auto">Notificação</strong>
+                                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="toast-body text-white {% if category == 'success' %}bg-success{% elif category == 'danger' %}bg-danger{% elif category == 'warning' %}bg-warning{% elif category == 'info' %}bg-info{% endif %}">
+                                {{ message }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+<!-- Campo de Busca -->
+<div class="mb-4">
+    <form id="searchForm" method="GET" action="/">
+        <div class="input-group">
+            <input type="text" class="form-control" id="searchQuery" name="search" placeholder="Buscar jogo..." value="{{ request.args.get('search', '') }}">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">Buscar</button>
+            </div>
+        </div>
+    </form>
+</div>
+        
+        
+       <div class="row d-flex justify-content-center">
+    {% for jogo in jogos %}
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <a href="{{ url_for('detalhes_jogo', jogo_id=jogo.id) }}">
+                <img src="{{ jogo.imagem }}" class="card-img-top" alt="{{ jogo.titulo }}">
+            </a>
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="{{ url_for('detalhes_jogo', jogo_id=jogo.id) }}">{{ jogo.titulo }}</a>
+                </h5>
+                <p class="card-text"><strong>{{ jogo.preco }}</strong></p>
+                <form action="{{ url_for('adicionar_ao_carrinho', jogo_id=jogo.id) }}" method="POST">
+                    <button type="submit" class="btn btn-primary">Adicionar ao Carrinho</button>
+                </form>
+            </div>
+        </div>
     </div>
-
+    {% endfor %}
+</div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
     <script>
-        function searchGames() {
-            const query = $('#search').val().toLowerCase();
-            $('.game-card').each(function () {
-                const gameName = $(this).data('name').toLowerCase();
-                $(this).toggle(gameName.includes(query));
-            });
-        }
-
-        $('#search').on('input', function () {
-            if ($(this).val() === '') {
-                $('.game-card').show();
-            } else {
-                searchGames();
-            }
+        $(document).ready(function () {
+            // Inicializa e exibe o toast
+            $('#toast-container .toast').toast('show');
         });
-
-        $(document).on('click', '.add-to-cart', function () {
-            const appid = $(this).data('appid');
-            $.post(`/add_to_cart/${appid}`, function (data) {
-                alert(data.message + ` (Total no carrinho: ${data.cart_count})`);
-            }).fail(function (error) {
-                alert('Erro ao adicionar o jogo ao carrinho: ' + error.responseJSON.message);
-            });
-        });
-
     </script>
+    
 </body>
-
 </html>

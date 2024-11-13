@@ -1,0 +1,110 @@
+/* Resetando margens e preenchimentos */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Corpo das páginas de login e cadastro */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #330057; /* Cor roxa suave */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Container do formulário (Login e Cadastro) */
+.login-container, .container {
+    background-color: #440073; /* Roxo suave para o formulário */
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 500px;
+}
+
+/* Título das páginas */
+h2 {
+    text-align: center;
+    color: #e0b3ff;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Estilo dos inputs */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 1rem;
+    border: 2px solid #5b006e; /* Roxo mais escuro para as bordas */
+    border-radius: 5px;
+    background-color: #330057; /* Fundo roxo claro para os campos */
+    color: white;
+    font-size: 1rem;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #e0b3ff; /* Foco em azul claro */
+    outline: none;
+}
+
+/* Estilo do botão de login/cadastro */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #5b006e; /* Roxo para o botão */
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #6b0080; /* Roxo mais claro no hover */
+}
+
+/* Estilo dos links de login e cadastro */
+p {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+a.register-link {
+    color: #e0b3ff;
+    text-decoration: none;
+}
+
+a.register-link:hover {
+    color: #d19eff;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .login-container, .container {
+        width: 90%; /* Ajustando a largura do formulário para telas menores */
+    }
+
+    h2 {
+        font-size: 1.8rem;
+    }
+
+    button[type="submit"] {
+        padding: 10px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+}

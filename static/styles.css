@@ -1,318 +1,366 @@
-@font-face {
-    font-family: 'Mindcontrol';
-    src: url('/static/fonts/MINDCONTROL.ttf');
-}
-
-/* Define um fundo roxo escuro para a página */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #4b0082; /* Fundo roxo */
-    color: #fff; /* Texto branco */
+/* Resetando margens e preenchimentos */
+* {
     margin: 0;
     padding: 0;
-    height: 100vh;
+    box-sizing: border-box;
 }
 
+/* Estilos para o corpo */
+body {
+    font-family: 'Roboto', sans-serif;
+    background: radial-gradient(circle, #8e44ad, #2c2c2c);
+    color: #fff;
+    padding-top: 80px; /* Ajuste para navbar fixa */
+}
 
-#titulo_index {
+/* Estilo da fonte personalizada */
+@font-face {
     font-family: 'Mindcontrol';
+    src: url('/static/fonts/Mindcontrol.ttf') format('truetype');
 }
 
-/* Estilo do Navbar */
+/* Container centralizado */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #2c2c2c;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Navbar fixa no topo */
 .navbar {
-    position: fixed; /* Fixa a navbar no topo da tela */
+    font-family: 'Mindcontrol', sans-serif;
+    position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    z-index: 1000; /* Garante que a navbar fique acima de outros elementos */
-    padding: 10px 0; /* Ajuste a altura da navbar */
-    background-color: #4b0082; /* A cor do fundo da navbar */
-    background-color: #4b0082; /* Roxo intenso */
-}
-
-.navbar-brand, .navbar-nav .nav-link {
-    color: #f3e5ff !important;
-    transition: color 0.3s;
-}
-
-.navbar-nav .nav-link:hover {
-    text-decoration: underline;
-    color: #dda0dd; /* Roxo claro */
-}
-
-.navbar .form-control {
-    background-color: #4b0082;
-    color: #f3e5ff;
-    border: 1px solid #7a42a6; /* Roxo médio */
-}
-
-/* Estilo dos botões */
-.btn-outline-success {
-    color: #f3e5ff;
-    border-color: #7a42a6;
-    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
-}
-
-.btn-outline-success:hover {
-    background-color: #7a42a6;
-    border-color: #4b0082;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.btn-primary {
-    background-color: #4b0082; /* Roxo escuro */
-    border: none;
-    color: #f3e5ff;
-    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
-}
-
-.btn-primary:hover {
-    background-color: #dda0dd; /* Roxo claro */
-    color: #2e004f; /* Texto mais escuro para contraste */
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-/* Títulos e texto */
-h1, .card-title {
-    color: #dda0dd; /* Roxo claro */
-    font-weight: 600;
-}
-
-/* Estilos dos cards */
-.card {
-    background-color: #7a42a6; /* Roxo médio */
-    border: 1px solid #dda0dd; /* Borda roxa clara */
-    color: #f3e5ff;
-    border-radius: 10px; /* Borda arredondada */
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.card:hover {
-    transform: scale(1.05);
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.card-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-/* Responsividade para dispositivos móveis */
-@media (max-width: 768px) {
-    .navbar .form-control {
-        width: 100%;
-        margin-top: 5px;
-    }
-    .card {
-        margin-bottom: 15px;
-    }
-    .navbar-nav {
-        text-align: center;
-    }
-}
-
-/* Estilo específico para os formulários de Login e Cadastro */
-.form-container {
-    background-color: #7a42a6; /* Roxo médio */
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    max-width: 500px;
-    margin: 50px auto;
-}
-
-.form-container h2 {
-    color: #dda0dd; /* Roxo claro */
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.form-group label {
-    color: #f3e5ff; /* Texto claro */
-}
-
-.form-group input {
-    border: 1px solid #7a42a6;
-    background-color: #4b0082;
-    color: #f3e5ff;
-    border-radius: 5px;
-    padding: 10px;
     width: 100%;
-    margin-bottom: 15px;
+    background-color: #fff;
+    color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    padding: 10px 0;
 }
 
-.form-group input:focus {
-    outline-color: #dda0dd; /* Roxo claro ao focar */
-    border-color: #dda0dd;
-}
-
-.btn-submit {
-    background-color: #4b0082;
-    color: #f3e5ff;
-    border: none;
-    padding: 10px 20px;
-    width: 100%;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-.btn-submit:hover {
-    background-color: #7a42a6;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Alinhamento de botões e links de navegação */
-.form-group .text-center a {
-    color: #dda0dd;
+.navbar a {
+    color: white;
+    font-size: 1.2rem;
     text-decoration: none;
+    padding: 0 20px;
 }
 
-.form-group .text-center a:hover {
-    text-decoration: underline;
+.navbar a:hover {
+    color: #e0b3ff;
 }
 
-/* Estilos para o formulário de contato */
-.bg-light {
-    background-color: #7a42a6 !important; /* Roxo médio para seções de formulário */
-}
-
-footer {
-    background-color: #4b0082; /* Roxo intenso para o rodapé */
-    color: #f3e5ff;
-}
-
-/* Ajustes adicionais */
-.container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 15px;
-}
-
-/* Estilo para os botões do acordeão */
-.accordion-button {
-    background-color: #4b0082; /* Roxo intenso */
-    color: #f3e5ff; /* Texto claro */
-    border: 1px solid #7a42a6; /* Borda roxa média */
-    padding: 15px;
-    font-size: 16px;
-    font-weight: bold;
-    transition: all 0.6s ease;
-}
-
-/* Alterações no botão ao passar o mouse */
-.accordion-button:hover {
-    background-color: #7a42a6; /* Roxo médio */
-    color: #2e004f; /* Texto escuro para contraste */
-    border-color: #dda0dd; /* Roxo claro */
-}
-
-/* Estado ativo do botão */
-.accordion-button:not(.collapsed) {
-    background-color: #7a42a6; /* Roxo médio */
-    color: #2e004f; /* Texto escuro para contraste */
-    border-color: #dda0dd; /* Roxo claro */
-}
-
-/* Página de Detalhes do Jogo */
-.game-details-page {
-    margin-top: 80px;
-    background-color: #4b0082; /* Fundo roxo */
-    padding: 50px 0;
-}
-
-.game-details-page h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #fff;
+/* Títulos */
+h2, h3 {
+    font-family: 'Mindcontrol', sans-serif;
+    color: #e0b3ff;
+    text-align: center;
     margin-bottom: 20px;
 }
 
-.game-details-page p {
-    font-size: 1.2rem;
-    color: #ddd;
+h2 {
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
 }
 
-/* Estilo do card de detalhes */
-.game-details-card {
-    display: flex;
-    justify-content: space-between;
-    background-color: #333;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    color: #fff;
-}
-
-.game-details-card img {
-    max-width: 400px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.game-details-card .details-text {
-    max-width: 600px;
-    padding-left: 20px;
-}
-
-.game-details-card .details-text h2 {
+h3 {
     font-size: 2rem;
+}
+
+/* Links */
+a {
     color: #fff;
-    margin-bottom: 10px;
-}
-
-.game-details-card .details-text p {
-    font-size: 1rem;
-    color: #bbb;
-}
-
-
-/* Botão de adicionar ao carrinho */
-.add-to-cart {
-    background-color: #4b0082;
-    border: none;
-    padding: 12px 30px;
-    font-size: 1.2rem;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.add-to-cart:hover {
-    background-color: #330057;
-}
-
-.add-to-cart i {
-    margin-right: 8px;
-}
-
-/* Animação do botão */
-.add-to-cart {
-    transition: transform 0.3s ease-in-out;
-}
-
-.add-to-cart:hover {
-    transform: scale(1.05);
-}
-
-/* Estilo do preço */
-.game-price {
-    font-size: 1.8rem;
-    color: #4b0082;
+    text-decoration: none;
     font-weight: bold;
+}
+
+a:hover {
+    color: #f39c12;
+}
+
+/* Estilo de formulário */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+    padding: 12px;
+    border: 2px solid #8e44ad;
+    border-radius: 10px;
+    background-color: #2c2c2c;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+    border-color: #f39c12;
+    box-shadow: 0 0 5px rgba(243, 156, 18, 0.6);
+    outline: none;
+}
+
+/* Botões */
+button {
+    padding: 12px 25px;
+    background-color: #8e44ad;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background-color: #f39c12;
+    transform: translateY(-3px);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button.btn-success {
+    background-color: #28a745;
+}
+
+button.btn-success:hover {
+    background-color: #218838;
+}
+
+/* Estilo para o container-1 */
+.container-1 {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    border-radius: 15px;
+    margin-top: 40px; 
+}
+
+/* Título do container-1 */
+.container-1 h1 {
+    font-family: 'MindControl', sans-serif;
+    color: #8e44ad;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* Estilo das listas */
+.list-group-item {
+    background-color: #2c2c2c;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    margin-bottom: 15px;
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.list-group-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.list-group-item strong {
+    color: #f39c12;
+}
+
+/* Ícones do FontAwesome */
+.navbar .nav-link i {
+    margin-right: 8px;
+    font-size: 1.2rem;
+}
+
+.navbar .nav-link:hover i {
+    color: #f0f0f0;
+}
+
+/* Rodapé */
+footer {
+    background-color: #4b006e;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    margin-top: 3rem;
+    border-top: 2px solid #e0b3ff;
+}
+
+
+/* Estilo para a container de toast */
+.toast-container {
+    position: relative;
+    top: 20%;
+    width: 100%;
+    z-index: 1050;
+    pointer-events: none;
+}
+
+/* Estilo dos toasts */
+.toast {
+    width: 100%;
+    margin-bottom: 15px;
+    pointer-events: all;
+    transition: all 0.5s ease-in-out;
+}
+
+/* Responsividade: Adapta o container-1 para telas pequenas */
+@media (max-width: 768px) {
+    .container-1 {
+        padding: 20px;
+    }
+
+    .container-1 h1 {
+        font-size: 2rem;
+    }
+
+    .toast {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* Adicionando um efeito para as notificações */
+.toast-header {
+    background-color: #8e44ad;
+    color: white;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.toast-body {
+    border-radius: 0 0 5px 5px;
+    padding: 15px;
+}
+
+/* Adiciona estilos de cores para as mensagens */
+.toast-body.bg-success {
+    background-color: #28a745;
+}
+
+.toast-body.bg-danger {
+    background-color: #dc3545;
+}
+
+.toast-body.bg-warning {
+    background-color: #ffc107;
+}
+
+.toast-body.bg-info {
+    background-color: #17a2b8;
+}
+
+/* Media query */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    h2, h3 {
+        font-size: 1.8rem;
+    }
+
+    button {
+        padding: 10px 20px;
+    }
+}
+
+/* Estilo para o container específico da página de detalhes do jogo */
+.container-detalhes {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #2c2c2c;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    margin-top: 50px;
+}
+
+/* Estilo para o título do jogo */
+.container-detalhes h1 {
+    font-family: 'Mindcontrol', sans-serif;
+    font-size: 3rem;
+    color: #e0b3ff;
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilo para a imagem do jogo */
+.container-detalhes img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: block;
+    margin: 0 auto 20px;
+}
+
+/* Estilo para os parágrafos */
+.container-detalhes p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* Estilo para as tags <strong> dentro de <p> */
+.container-detalhes p strong {
+    color: #8e44ad;
+}
+
+/* Botões de ação */
+.container-detalhes form button,
+.container-detalhes a.btn {
+    background-color: #bbab88;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    display: inline-block;
     margin-top: 20px;
+    text-decoration: none;
+}
+
+.container-detalhes form button:hover,
+.container-detalhes a.btn:hover {
+    background-color: #f39c12;
+    transform: translateY(-3px);
+}
+
+.container-detalhes form button:active,
+.container-detalhes a.btn:active {
+    transform: translateY(1px);
+}
+
+.container-detalhes form button:disabled,
+.container-detalhes a.btn:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-    .game-details-card {
-        flex-direction: column;
-        text-align: center;
+    .container-detalhes {
+        padding: 20px;
     }
 
-    .game-details-card img {
-        margin-bottom: 20px;
+    .container-detalhes h1 {
+        font-size: 2.5rem;
+    }
+
+    .container-detalhes p {
+        font-size: 1rem;
     }
 }

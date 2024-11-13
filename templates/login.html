@@ -1,37 +1,40 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Loja de Jogos</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"> 
+    <title>Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="static/login_cadastro.css">
 </head>
 <body>
-    {% include 'navbar.html' %}
-<!-- Formulário de Login -->
-    <div class="container">
-        <div class="form-container">
-            <h2>Login</h2>
-            <form action="/login" method="POST">
-                <div class="form-group">
-                    <label for="email">E-mail</label>
-                    <input type="email" id="email" class="form-control" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Senha</label>
-                    <input type="password" id="password" class="form-control" name="password" required>
-                </div>
-                <button type="submit" class="btn btn-submit">Entrar</button>
-                <div class="text-center">
-                    <p>Não tem uma conta? <a href="/cadastro">Cadastre-se aqui</a></p>
-                </div>
-            </form>
-        </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a style="font-family: Mindcontrol;" class="navbar-brand ml-4" href="/">
+            <i class="fas fa-gamepad"></i> GOG - GAMES ONLINE
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+
+    <div class="container mt-5">
+        <h2>Login</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" class="form-control" name="email" required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" class="form-control" name="senha" required>
+            </div>
+            <button type="submit" class="btn btn-success">Entrar</button>
+        </form>
+        <p>Não tem conta? <a href="{{ url_for('cadastro') }}">Cadastre-se aqui</a></p>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

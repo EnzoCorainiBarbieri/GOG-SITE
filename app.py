@@ -1,235 +1,125 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import requests
-import sqlite3
-
+from datetime import datetime
+import pytz
+brasil_tz = pytz.timezone('America/Sao_Paulo')
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///meu_banco.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'sua_chave_secreta_aqui'
+db = SQLAlchemy(app)
 
-cache = {}
-appids = [
-     570, 730, 440, 578080, 292030, 271590, 578080, 1174180, 582010, 1091500, 
-    105600, 292030, 49520, 271590, 1174180, 611500, 346110, 381210, 252490, 
-    8930, 578080, 271590, 239140, 620, 500, 570, 440, 550, 730, 
-    242760, 239140, 400, 8930, 105600, 8930, 4000, 221100, 457140, 282070,
-    381210, 4000, 251570, 282070, 431240, 480, 221380, 216890, 107410, 814380
-]
+class Usuario(db.Model):
+    __tablename__ = 'usuarios'
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    senha = db.Column(db.String(255), nullable=False)
+    compras = db.relationship('Compra', backref='usuario', lazy=True)
 
-def init_db():
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
+class Jogo(db.Model):
+    __tablename__ = 'jogos'
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(100), nullable=False)
+    descricao = db.Column(db.Text)
+    preco = db.Column(db.DECIMAL(10, 2), nullable=False)
+    imagem = db.Column(db.String(255))
 
-    cursor.execute('''CREATE TABLE IF NOT EXISTS jogos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        appid INTEGER UNIQUE NOT NULL,
-        nome VARCHAR(255) NOT NULL,
-        preco DECIMAL(5,2),
-        imagem_url TEXT,
-        descricao TEXT,
-        categorias TEXT
-    );''')
+class Compra(db.Model):
+    __tablename__ = 'compras'
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    jogo_id = db.Column(db.Integer, db.ForeignKey('jogos.id'), nullable=False)
+    valor = db.Column(db.DECIMAL(10, 2), nullable=False, default=0.00)
+    nome_jogo = db.Column(db.String(100))
+    data = db.Column(db.DateTime, default=datetime.now(brasil_tz)) 
+    
+    jogo = db.relationship('Jogo', backref='compras', lazy=True)
+    
+with app.app_context():
+    db.create_all()
+    
+# URL da API da Steam para listar jogos (adicione sua chave da API se necessário)
+STEAM_API_URL = "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
 
-    cursor.execute('''CREATE TABLE IF NOT EXISTS clientes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome VARCHAR(100) NOT NULL,
-        email VARCHAR(100) UNIQUE NOT NULL,
-        senha VARCHAR(255) NOT NULL,
-        endereco TEXT,
-        telefone VARCHAR(15)
-    );''')
+@app.route('/')
+def listar_jogos():
+    ids_jogos_steam = [570, 730, 440, 578080, 292030, 271590, 578080, 1174180, 582010, 1091500, 381210, 4000, 251570, 282070, 431240, 480, 221380, 216890, 107410, 814380]
+    jogos = []
+    carrinho = session.get('carrinho', [])
 
-    cursor.execute('''CREATE TABLE IF NOT EXISTS carrinho (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        cliente_id INTEGER NOT NULL,
-        jogo_id INTEGER NOT NULL,
-        quantidade INTEGER NOT NULL,
-        FOREIGN KEY(cliente_id) REFERENCES clientes(id),
-        FOREIGN KEY(jogo_id) REFERENCES jogos(id)
-    );''')
 
-    conn.commit()
-    conn.close()
+    termo_pesquisa = request.args.get('search', '').lower()
 
-def salvar_jogo_no_bd(jogo):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
+    for id_jogo in ids_jogos_steam:
+        resposta = requests.get(f"https://store.steampowered.com/api/appdetails?appids={id_jogo}&l=portuguese")
+        
 
-    cursor.execute('''INSERT OR IGNORE INTO jogos (appid, nome, preco, imagem_url, descricao, categorias)
-                      VALUES (?, ?, ?, ?, ?, ?)''', (
-        jogo['appid'],
-        jogo['name'],
-        jogo['price'],
-        jogo['image'],
-        jogo['description'],
-        ', '.join(jogo['categories'])
-    ))
-
-    conn.commit()
-    conn.close()
-
-def get_steam_game_data(appid):
-    if appid in cache:
-        return cache[appid]
-
-    url = f'https://store.steampowered.com/api/appdetails?appids={appid}&cc=us&l=en'
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        data = response.json()
-        if data[str(appid)]['success']:
-            game_data = data[str(appid)]['data']
-            price_str = game_data['price_overview']['final_formatted'] if 'price_overview' in game_data else 'Gratuito'
-            if price_str != 'Gratuito':
-                price = float(price_str.replace('$', '').replace(',', ''))
-            else:
-                price = 0.0
+        if resposta.status_code == 200:
+            dados_resposta = resposta.json().get(str(id_jogo), None)
             
-            game_info = {
-                'name': game_data['name'],
-                'price': price,  # Usar o valor convertido
-                'image': game_data['header_image'],
-                'description': game_data['short_description'],
-                'categories': [cat['description'] for cat in game_data.get('categories', [])],
-                'appid': appid
-            }
-            cache[appid] = game_info
-            salvar_jogo_no_bd(game_info)
-            return game_info
-    return None
+ 
+            if dados_resposta and 'data' in dados_resposta:
+                dados_jogo = dados_resposta['data']
+                titulo_jogo = dados_jogo.get('name', 'Jogo Desconhecido')
+                
 
-def populate_games():
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM jogos")
-    count = cursor.fetchone()[0]
-    conn.close()
-
-    if count == 0:
-        for appid in appids:
-            get_steam_game_data(appid)
-
-@app.route('/', methods=['GET', 'POST'])
-def home():
-    populate_games()
-    search_query = request.args.get('search_query', '').lower()
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-
-    if search_query:
-        cursor.execute('SELECT * FROM jogos WHERE LOWER(nome) LIKE ?', (f'%{search_query}%',))
-    else:
-        cursor.execute('SELECT * FROM jogos')
-
-    jogos = cursor.fetchall()
-    conn.close()
+                if termo_pesquisa in titulo_jogo.lower() or not termo_pesquisa:
+                    jogos.append({
+                        'id': id_jogo,
+                        'titulo': titulo_jogo,
+                        'descricao': dados_jogo.get('short_description', ''),
+                        'imagem': dados_jogo.get('header_image', ''),
+                        'preco': dados_jogo.get('price_overview', {}).get('final_formatted', 'Grátis'),
+                        'no_carrinho': id_jogo in carrinho
+                    })
 
     return render_template('index.html', jogos=jogos)
 
-def validar_usuario(email, senha):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
+@app.route('/jogo/<int:jogo_id>')
+def detalhes_jogo(jogo_id):
+    resposta = requests.get(f"https://store.steampowered.com/api/appdetails?appids={jogo_id}&l=portuguese")
+    dados_jogo = resposta.json().get(str(jogo_id), {}).get('data', {})
 
-    cursor.execute("SELECT * FROM clientes WHERE email = ?", (email,))
-    usuario = cursor.fetchone()
+    if not dados_jogo:
+        return "Jogo não encontrado", 404
 
-    conn.close()
+    jogo = {
+        'id': jogo_id,
+        'titulo': dados_jogo.get('name', 'Jogo Desconhecido'),
+        'descricao': dados_jogo.get('detailed_description', ''),
+        'imagem': dados_jogo.get('header_image', ''),
+        'preco': dados_jogo.get('price_overview', {}).get('final_formatted', 'Grátis'),
+        'desenvolvedor': dados_jogo.get('developers', []),
+        'publicador': dados_jogo.get('publishers', []),
+        'data_lancamento': dados_jogo.get('release_date', {}).get('date', 'Data não disponível'),
+        'genero': [genre['description'] for genre in dados_jogo.get('genres', [])],
+        'avaliacoes': dados_jogo.get('metacritic', {}).get('score', 'Sem avaliações')
+    }
 
-    if usuario and check_password_hash(usuario[3], senha):
-        return usuario
-    else:
-        return None
-    
-def get_game_details(appid):
-    url = f"https://store.steampowered.com/api/appdetails?appids={appid}"
-    response = requests.get(url)
-    data = response.json()
-    
-    if data[str(appid)]['success']:
-        game_data = data[str(appid)]['data']
-        return {
-            'name': game_data['name'],
-            'description': game_data.get('short_description', 'Descrição não disponível'),
-            'price': game_data['price_overview']['final_formatted'] if 'price_overview' in game_data else 'Preço não disponível',
-            'image': game_data['header_image'] if 'header_image' in game_data else None
-        }
-    else:
-        return None
-    
-@app.route('/game_details/<appid>')
-def game_details(appid):
-    game_info = get_game_details(appid)
-    if game_info:
-        return render_template('game_details.html', game=game_info)
-    else:
-        return render_template('error.html', message="Não foi possível carregar as informações do jogo.")
+    return render_template('detalhes_jogo.html', jogo=jogo)
+
+@app.route('/suporte')
+def suporte():
+    return render_template('suporte.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form['email']
-        senha = request.form['password']
+        senha = request.form['senha']
+        usuario = Usuario.query.filter_by(email=email).first()
 
-        # Validar o usuário
-        usuario = validar_usuario(email, senha)
-
-        if usuario:
-            # Armazenar os dados do usuário na sessão
-            session['user_id'] = usuario[0]  # id do usuário
-            session['user_name'] = usuario[1]  # nome do usuário
-            session['user_email'] = usuario[2]  # email do usuário
-            return redirect('/usuario')  # Redireciona para a página de perfil do usuário
+        if usuario and check_password_hash(usuario.senha, senha):
+            session['usuario_id'] = usuario.id
+            flash('Login bem-sucedido!', 'success')
+            return redirect(url_for('listar_jogos'))
         else:
-            return 'Usuário ou senha inválidos'
-
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()  # Limpar a sessão
-    return redirect('/login')  # Redirecionar para a página de login
-
-@app.route('/usuario')
-def usuario():
-    if 'user_id' not in session:
-        return redirect('/login')  # Se não estiver logado, redireciona para o login
-
-    user_id = session['user_id']
-
-    # Consultar as informações do cliente
-    conexao = sqlite3.connect('database.db')
-    cursor = conexao.cursor()
-    cursor.execute("SELECT nome, email FROM clientes WHERE id = ?", (user_id,))
-    usuario = cursor.fetchone()  # Obtém nome e email do usuário
-
-    # Consultar os jogos que o cliente tem no carrinho
-    cursor.execute('''SELECT jogos.nome, jogos.preco, carrinho.quantidade
-                    FROM jogos
-                    JOIN carrinho ON jogos.id = carrinho.jogo_id
-                    WHERE carrinho.cliente_id = ?''', (user_id,))
-    jogos_comprados = cursor.fetchall()  # Lista de jogos comprados/adicionados ao carrinho
-
-    conexao.close()
-
-    return render_template('usuario.html', usuario=usuario, jogos_comprados=jogos_comprados)
-
-def get_meus_jogos(user_id):
-    # Conectar ao banco de dados
-    conn = sqlite3.connect('sua_base_de_dados.db')
-    cursor = conn.cursor()
-
-    # Consultar os jogos adquiridos pelo usuário
-    cursor.execute('''
-        SELECT jogos.nome, jogos.preco, jogos_usuario.data_compra
-        FROM jogos
-        JOIN jogos_usuario ON jogos.id = jogos_usuario.jogo_id
-        WHERE jogos_usuario.usuario_id = ?
-    ''', (user_id,))
+            flash('Credenciais inválidas!', 'danger')
     
-    jogos_comprados = cursor.fetchall()
-    conn.close()
-
-    return jogos_comprados
-
+    return render_template('login.html')
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
@@ -237,232 +127,174 @@ def cadastro():
         nome = request.form['nome']
         email = request.form['email']
         senha = request.form['senha']
-        endereco = request.form['endereco']
-        telefone = request.form['telefone']
+        senha_hash = generate_password_hash(senha)
 
-        hashed_senha = generate_password_hash(senha)
+        if Usuario.query.filter_by(email=email).first():
+            flash('E-mail já cadastrado!', 'danger')
+            return redirect(url_for('cadastro'))
 
-        conn = sqlite3.connect('database.db')
-        cursor = conn.cursor()
-
-        cursor.execute('SELECT * FROM clientes WHERE email = ?', (email,))
-        usuario_existente = cursor.fetchone()
-
-        if usuario_existente:
-            conn.close()
-            return render_template('cadastro.html', error='Email já cadastrado.')
-
-        try:
-            cursor.execute('''INSERT INTO clientes (nome, email, senha, endereco, telefone)
-                              VALUES (?, ?, ?, ?, ?)''', (nome, email, hashed_senha, endereco, telefone))
-            conn.commit()
-            return redirect(url_for('login'))
-        except sqlite3.IntegrityError:
-            return render_template('cadastro.html', error='Erro ao cadastrar o cliente.')
-        finally:
-            conn.close()
+        novo_usuario = Usuario(nome=nome, email=email, senha=senha_hash)
+        db.session.add(novo_usuario)
+        db.session.commit()
+        flash('Cadastro realizado com sucesso!', 'success')
+        return redirect(url_for('login'))
 
     return render_template('cadastro.html')
 
-@app.route('/cart')
-def view_cart():
-    if 'user_id' not in session:
-        return redirect('/login')
-    
-    user_id = session['user_id']
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
+@app.route('/perfil')
+def perfil():
+    if 'usuario_id' not in session:
+        flash('Você precisa estar logado para acessar o perfil!', 'warning')
+        return redirect(url_for('login'))
 
-    cursor.execute('''SELECT jogos.nome, jogos.preco, carrinho.quantidade
-                      FROM jogos
-                      JOIN carrinho ON jogos.id = carrinho.jogo_id
-                      WHERE carrinho.cliente_id = ?''', (user_id,))
-    cart_items = cursor.fetchall()
-    
-    total_price = sum(float(item[1]) * item[2] for item in cart_items)  # Calcular o total do carrinho
-    
-    conn.close()
+    usuario_id = session['usuario_id']
+    usuario = db.session.get(Usuario, usuario_id)
 
-    return render_template('cart.html', cart_items=cart_items, total=total_price)
+    if not usuario:
+        flash('Usuário não encontrado!', 'warning')
+        return redirect(url_for('login'))
 
-@app.route('/add_to_cart/<int:appid>', methods=['POST'])
-def add_to_cart(appid):
-    if 'user_id' not in session:
-        return jsonify({'message': 'Você precisa estar logado para adicionar ao carrinho.'}), 400
+    compras = Compra.query.filter_by(usuario_id=usuario.id).all()
+    return render_template('perfil.html', usuario=usuario, compras=compras)
 
-    user_id = session['user_id']
-    
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
+@app.route('/logout')
+def logout():
+    session.pop('usuario_id', None)
+    flash('Você saiu com sucesso!', 'info')
+    return redirect(url_for('listar_jogos'))
 
-    cursor.execute('''SELECT id FROM jogos WHERE appid = ?''', (appid,))
-    jogo = cursor.fetchone()
+@app.route('/comprar_jogo/<int:jogo_id>', methods=['POST'])
+def comprar_jogo(jogo_id):
+    if 'usuario_id' not in session:
+        flash('Você precisa estar logado para comprar um jogo!', 'warning')
+        return redirect(url_for('login'))
 
-    if not jogo:
-        return jsonify({'message': 'Jogo não encontrado.'}), 404
+    if 'carrinho' not in session:
+        session['carrinho'] = []
 
-    jogo_id = jogo[0]
+    if jogo_id not in session['carrinho']:
+        session['carrinho'].append(jogo_id)
 
-    cursor.execute('''SELECT id FROM carrinho WHERE cliente_id = ? AND jogo_id = ?''', (user_id, jogo_id))
-    existing_item = cursor.fetchone()
+    flash('Jogo adicionado ao carrinho!', 'success')
+    return redirect(url_for('listar_jogos'))
 
-    if existing_item:
-        cursor.execute('''UPDATE carrinho SET quantidade = quantidade + 1 WHERE cliente_id = ? AND jogo_id = ?''', (user_id, jogo_id))
-    else:
-        cursor.execute('''INSERT INTO carrinho (cliente_id, jogo_id, quantidade) VALUES (?, ?, ?)''', (user_id, jogo_id, 1))
+@app.route('/adicionar_ao_carrinho/<int:jogo_id>', methods=['POST'])
+def adicionar_ao_carrinho(jogo_id):
+    if 'usuario_id' not in session:
+        flash('Você precisa estar logado para adicionar um jogo ao carrinho!', 'warning')
+        return redirect(url_for('login'))
 
-    conn.commit()
-    conn.close()
+    if 'carrinho' not in session:
+        session['carrinho'] = []
 
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute('''SELECT COUNT(*) FROM carrinho WHERE cliente_id = ?''', (user_id,))
-    cart_count = cursor.fetchone()[0]
-    conn.close()
+    if jogo_id not in session['carrinho']:
+        session['carrinho'].append(jogo_id)
 
-    return jsonify({'message': 'Jogo adicionado ao carrinho!', 'cart_count': cart_count})
+    flash(f'Jogo {jogo_id} adicionado ao carrinho!', 'success')
+    return redirect(url_for('listar_jogos'))
 
-@app.route('/remove_from_cart/<appid>', methods=['POST'])
-def remove_from_cart(appid):
-    if 'user_id' not in session:
-        return jsonify({'message': 'Você precisa estar logado para remover do carrinho.'}), 400
+@app.route('/carrinho')
+def carrinho():
+    if 'carrinho' not in session or not session['carrinho']:
+        return render_template('carrinho.html', jogos=[])
 
-    user_id = session['user_id']
-    
-    # Obter o id do jogo pelo appid
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''SELECT id FROM jogos WHERE appid = ?''', (appid,))
-    jogo = cursor.fetchone()
-    
-    if not jogo:
-        return jsonify({'message': 'Jogo não encontrado.'}), 404
-    
-    jogo_id = jogo[0]
-    
-    # Remover o item do carrinho
-    cursor.execute('''DELETE FROM carrinho WHERE cliente_id = ? AND jogo_id = ?''', (user_id, jogo_id))
-    conn.commit()
+    jogos_no_carrinho = []
+    total = 0.0  
+    for jogo_id in session['carrinho']:
+        resposta = requests.get(f"https://store.steampowered.com/api/appdetails?appids={jogo_id}&l=portuguese")
+        dados_jogo = resposta.json().get(str(jogo_id), {}).get('data', {})
+        if dados_jogo:
+            jogo = {
+                'id': jogo_id,
+                'titulo': dados_jogo.get('name', 'Jogo Desconhecido'),
+                'descricao': dados_jogo.get('short_description', ''),
+                'imagem': dados_jogo.get('header_image', ''),
+                'preco': dados_jogo.get('price_overview', {}).get('final_formatted', 'Grátis')
+            }
+            jogos_no_carrinho.append(jogo)
 
-    # Obter os itens restantes no carrinho
-    cursor.execute('''SELECT jogos.nome, jogos.preco, carrinho.quantidade
-                      FROM jogos
-                      JOIN carrinho ON jogos.id = carrinho.jogo_id
-                      WHERE carrinho.cliente_id = ?''', (user_id,))
-    cart_items = cursor.fetchall()
+            
+            price_overview = dados_jogo.get('price_overview', {})
+            preco_centavos = price_overview.get('final', 0)  
+            preco = preco_centavos / 100.0 
+            total += preco  
+        else:
+            jogos_no_carrinho.append({
+                'id': jogo_id,
+                'titulo': 'Jogo Desconhecido',
+                'descricao': '',
+                'imagem': '',
+                'preco': 'Grátis'
+            })
 
-    total_price = sum(float(item[1]) * item[2] for item in cart_items)  # Calcular o total atualizado
+    return render_template('carrinho.html', jogos=jogos_no_carrinho, total=total)
 
-    conn.close()
+@app.route('/cancelar_compra/<int:compra_id>', methods=['POST'])
+def cancelar_compra(compra_id):
+    if 'usuario_id' not in session:
+        flash('Você precisa estar logado para cancelar uma compra!', 'warning')
+        return redirect(url_for('login'))
 
-    return jsonify({'message': 'Produto removido com sucesso!', 'total': total_price, 'cart_items': cart_items})
+    compra = Compra.query.get(compra_id)
+    if not compra or compra.usuario_id != session['usuario_id']:
+        flash('Compra não encontrada ou não pertence a você!', 'danger')
+        return redirect(url_for('perfil'))
 
-@app.route('/update_cart/<appid>', methods=['POST'])
-def update_cart(appid):
-    if 'user_id' not in session:
-        return jsonify({'message': 'Você precisa estar logado para atualizar o carrinho.'}), 400
-    
-    user_id = session['user_id']
-    new_quantity = int(request.form['quantity'])
-    
-    # Obter o id do jogo
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''SELECT id FROM jogos WHERE appid = ?''', (appid,))
-    jogo = cursor.fetchone()
+    db.session.delete(compra)
+    db.session.commit()
 
-    if not jogo:
-        return jsonify({'message': 'Jogo não encontrado.'}), 404
-    
-    jogo_id = jogo[0]
-    
-    # Atualizar a quantidade no carrinho
-    cursor.execute('''UPDATE carrinho SET quantidade = ? WHERE cliente_id = ? AND jogo_id = ?''', (new_quantity, user_id, jogo_id))
-    conn.commit()
+    flash('Pedido excluído com sucesso!', 'success')
+    return redirect(url_for('perfil'))
 
-    # Obter os itens do carrinho para retornar os dados atualizados
-    cursor.execute('''SELECT jogos.nome, jogos.preco, carrinho.quantidade
-                      FROM jogos
-                      JOIN carrinho ON jogos.id = carrinho.jogo_id
-                      WHERE carrinho.cliente_id = ?''', (user_id,))
-    cart_items = cursor.fetchall()
+@app.route('/remover_do_carrinho/<int:jogo_id>', methods=['POST'])
+def remover_do_carrinho(jogo_id):
+    if 'carrinho' not in session or jogo_id not in session['carrinho']:
+        flash('Jogo não encontrado no carrinho!', 'warning')
+        return redirect(url_for('carrinho'))
 
-    total_price = sum(float(item[1]) * item[2] for item in cart_items)  # Calcular o total atualizado
-
-    conn.close()
-
-    return jsonify({'message': 'Quantidade atualizada com sucesso!', 'total': total_price, 'cart_items': cart_items})
+    session['carrinho'].remove(jogo_id)
+    flash('Jogo removido do carrinho!', 'success')
+    return redirect(url_for('carrinho'))
 
 @app.route('/finalizar_compra', methods=['POST'])
 def finalizar_compra():
-    cliente_id = session.get('cliente_id')  # Obtendo o cliente logado
-    if not cliente_id:
-        return "Você precisa estar logado para finalizar a compra."
+    if 'usuario_id' not in session:
+        flash('Você precisa estar logado para finalizar a compra!', 'warning')
+        return redirect(url_for('login'))
 
-    # Acessa o carrinho do usuário
-    conexao = sqlite3.connect('database.db')
-    cursor = conexao.cursor()
+    carrinho = session.get('carrinho', [])
+    
+    if not carrinho:
+        flash('Seu carrinho está vazio!', 'warning')
+        return redirect(url_for('listar_jogos'))
 
-    # Primeiro, obtém todos os jogos no carrinho do cliente
-    cursor.execute('''
-        SELECT jogo_id, quantidade FROM carrinho WHERE cliente_id = ?
-    ''', (cliente_id,))
-    jogos_no_carrinho = cursor.fetchall()
+    usuario_id = session['usuario_id']
 
-    if not jogos_no_carrinho:
-        return "O carrinho está vazio."
+    for jogo_id in carrinho:
+        resposta = requests.get(f"https://store.steampowered.com/api/appdetails?appids={jogo_id}&l=portuguese")
+        dados_jogo = resposta.json().get(str(jogo_id), {}).get('data', {})
 
-    # Adiciona os jogos à tabela 'jogos_usuario'
-    try:
-        for jogo_id, quantidade in jogos_no_carrinho:
-            cursor.execute('''
-                INSERT INTO jogos_usuario (cliente_id, jogo_id, data_compra)
-                VALUES (?, ?, CURRENT_TIMESTAMP)
-            ''', (cliente_id, jogo_id))
+        if dados_jogo:
+            nome_jogo = dados_jogo.get('name', 'Jogo Desconhecido')
+            price_overview = dados_jogo.get('price_overview', {})
+            preco = price_overview.get('final', 0) if price_overview else 0
 
-            # Atualiza o estoque no carrinho (se necessário)
-            cursor.execute('''
-                UPDATE carrinho
-                SET quantidade = quantidade - ?
-                WHERE cliente_id = ? AND jogo_id = ?
-            ''', (quantidade, cliente_id, jogo_id))
+            if preco:
+                preco_formatado = float(preco) / 100  
+            else:
+                preco_formatado = 0.0
+        else:
+            nome_jogo = 'Jogo Desconhecido'
+            preco_formatado = 0.0
 
-        # Remove os itens do carrinho após a compra
-        cursor.execute('DELETE FROM carrinho WHERE cliente_id = ?', (cliente_id,))
-        conexao.commit()
+        nova_compra = Compra(usuario_id=usuario_id, jogo_id=jogo_id, valor=preco_formatado, nome_jogo=nome_jogo)
+        db.session.add(nova_compra)
 
-        return "Compra finalizada com sucesso!"
-    except Exception as e:
-        print(f"Erro ao finalizar a compra: {e}")
-        conexao.rollback()
-        return "Erro ao finalizar a compra. Tente novamente."
-
-    finally:
-        conexao.close()
-
-@app.route('/support')
-def suporte():
-    return render_template('support.html')
-
-@app.route('/reset_cart')
-def reset_cart():
-    if 'user_id' not in session:
-        return redirect('/login')  
-
-    user_id = session['user_id']
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-
-    # Remove todos os itens do carrinho para o usuário atual
-    cursor.execute('DELETE FROM carrinho WHERE cliente_id = ?', (user_id,))
-    conn.commit()
-    conn.close()
-
-    return redirect('/cart')
-
+    db.session.commit()
+    session['carrinho'] = []
+    
+    flash('Compra realizada com sucesso!', 'success')  
+    return redirect(url_for('listar_jogos'))
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)

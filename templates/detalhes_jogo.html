@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ jogo.titulo }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a style="font-family: Mindcontrol;" class="navbar-brand ml-4" href="/">
+            <i class="fas fa-gamepad"></i> GOG - GAMES ONLINE
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse mr-3" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if 'usuario_id' in session %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('perfil') }}">
+                            <i class="fas fa-user"></i> {{ session['user_name'] }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('suporte') }}">
+                            <i class="fas fa-life-ring"> Suporte</i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('carrinho') }}">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="badge badge-light">{{ session.get('carrinho', [])|length }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt"></i> Sair
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-user"></i> Entrar/Cadastrar
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    <div class="container-detalhes mt-5">
+        <h1>{{ jogo.titulo }}</h1>
+        <img src="{{ jogo.imagem }}" alt="{{ jogo.titulo }}" class="img-fluid mb-3">
+        <p><strong>Preço:</strong> {{ jogo.preco }}</p>
+        <p><strong>Data de Lançamento:</strong> {{ jogo.data_lancamento }}</p>
+        <p><strong>Desenvolvedor:</strong> {{ jogo.desenvolvedor | join(', ') }}</p>
+        <p><strong>Publicador:</strong> {{ jogo.publicador | join(', ') }}</p>
+        <p><strong>Gênero:</strong> {{ jogo.genero | join(', ') }}</p>
+        <p><strong>Avaliações:</strong> {{ jogo.avaliacoes }}</p>
+        <p>{{ jogo.descricao | safe }}</p>
+        <form action="{{ url_for('adicionar_ao_carrinho', jogo_id=jogo.id) }}" method="POST">
+            <button type="submit" class="btn btn-primary">Adicionar ao Carrinho</button>
+        </form>
+        <a href="/" class="btn btn-secondary">Voltar à Lista</a>
+    </div>
+</body>
+</html>

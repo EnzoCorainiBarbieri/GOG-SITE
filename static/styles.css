@@ -20,6 +20,13 @@ body {
 
 /* Estilo do Navbar */
 .navbar {
+    position: fixed; /* Fixa a navbar no topo da tela */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* Garante que a navbar fique acima de outros elementos */
+    padding: 10px 0; /* Ajuste a altura da navbar */
+    background-color: #4b0082; /* A cor do fundo da navbar */
     background-color: #4b0082; /* Roxo intenso */
 }
 
@@ -210,6 +217,7 @@ footer {
 
 /* Página de Detalhes do Jogo */
 .game-details-page {
+    margin-top: 80px;
     background-color: #4b0082; /* Fundo roxo */
     padding: 50px 0;
 }
